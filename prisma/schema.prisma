@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native"]
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model users {
+  id                    String                 @id @unique
+  roles                 roles                  @relation(fields: [id_role], references: [id])
+  id_role               String
+  name                  String                 @db.VarChar(50)
+  username              String                 @db.VarChar(30)
+  phone                 String                 @db.VarChar(13)
+  email                 String                 @db.VarChar(50)
+  password              String
+  refresh_token         String?                @db.Text
+  createdAt             DateTime               @default(now())
+  updatedAt             DateTime               @updatedAt
+  corpus                corpus[]
+  course_material       course_material[]
+  word2vec              word2vec[]
+  similarity            similarity[]
+  profile_images        profile_images?
+  password_reset_tokens password_reset_tokens?
+}
+
+model roles {
+  id        String   @id @unique
+  role_name String   @db.VarChar(10)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  users     users[]
+}
+
+model profile_images {
+  id             String   @id @unique
+  users          users    @relation(fields: [id_user], references: [id])
+  id_user        String   @unique
+  image_name     String
+  image_path     String
+  image_size     Int
+  image_url      String
+  image_mimetype String
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model password_reset_tokens {
+  users     users    @relation(fields: [id_user], references: [id])
+  id_user   String   @unique
+  token     String
+  used      Int      @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model corpus {
+  id                String   @id @unique
+  users             users    @relation(fields: [id_user], references: [id])
+  id_user           String
+  course            String   @db.VarChar(100)
+  book_title        String   @db.VarChar(30)
+  in_name           String
+  in_file_path      String
+  in_file_mimetype  String
+  in_file_size      Int
+  in_file_url       String
+  out_name          String
+  out_file_path     String
+  out_file_mimetype String
+  out_file_size     Int
+  out_file_url      String
+  conversion_type   String   @db.VarChar(10)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model course_material {
+  id            String   @id @unique
+  users         users    @relation(fields: [id_user], references: [id])
+  id_user       String
+  course        String   @db.VarChar(100)
+  book_title    String   @db.VarChar(30)
+  name          String
+  file_path     String
+  file_mimetype String
+  file_size     Int
+  file_url      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model word2vec {
+  id                String   @id @unique
+  users             users    @relation(fields: [id_user], references: [id])
+  id_user           String
+  course            String   @db.VarChar(100)
+  book_title        String   @db.VarChar(30)
+  in_name           String
+  in_file_path      String
+  in_file_mimetype  String
+  in_file_size      Int
+  in_file_url       String
+  out_name          String
+  out_file_path     String
+  out_file_mimetype String
+  out_file_size     Int
+  out_file_url      String
+  conversion_type   String   @db.VarChar(10)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+}
+
+model similarity {
+  id              String   @id @unique
+  users           users    @relation(fields: [id_user], references: [id])
+  id_user         String
+  student_nim     String   @db.VarChar(11)
+  student_class   String   @db.VarChar(10)
+  exam_name       String   @db.VarChar(100)
+  question_number Int
+  student_answer  String   @db.Text
+  total_score     Float
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
